@@ -24,17 +24,21 @@ struct Stone{
 
 set<Stone> s;
 
+void SortStone(int& a, int& b, int& c){
+    if(a > c)
+        swap(a, c);
+    if(b > c)
+        swap(b, c);
+    if(a > b)
+        swap(a, b);
+}
+
 void Add(queue<Stone> &q, int a, int b){
     int ca = a + a;
     int cb = b - a;
     int cc = sumNum - (a + b);
     
-    if(ca > cc)
-        swap(ca, cc);
-    if(cb > cc)
-        swap(cb, cc);
-    if(ca > cb)
-        swap(ca, cb);
+    SortStone(ca, cb, cc);
     
     if(ca < 0 || cc > sumNum)
         return;
@@ -51,12 +55,7 @@ int main(){
     
     cin >> A >> B >> C;
     sumNum = A + B + C;
-    if(A > C)
-        swap(A, C);
-    if(B > C)
-        swap(B, C);
-    if(A > B)
-        swap(A, B);
+    SortStone(A, B, C);
     
     queue<Stone> q;
     q.push(Stone(A, B));
