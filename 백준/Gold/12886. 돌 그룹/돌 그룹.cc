@@ -1,7 +1,6 @@
 #include<iostream>
 #include<queue>
 #include<algorithm>
-#include<set>
 
 using namespace std;
 
@@ -21,8 +20,6 @@ struct Stone{
         
     }
 };
-
-set<Stone> s;
 
 void SortStone(int& a, int& b, int& c){
     if(a > c)
