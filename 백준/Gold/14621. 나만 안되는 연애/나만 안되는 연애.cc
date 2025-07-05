@@ -64,6 +64,10 @@ int main(){
         int s, e, dist;
         cin >> s >> e >> dist;
         
+        
+        if(isMenUniversity[s] == isMenUniversity[e])
+            continue;
+        
         nodes.emplace_back(s, e, dist);
     }
     
@@ -75,9 +79,6 @@ int main(){
         int s = nodes[i].s;
         int e = nodes[i].e;
         int dist = nodes[i].dist;
-        
-        if(isMenUniversity[s] == isMenUniversity[e])
-            continue;
         
         bool isMergeSuccess = Merge(s, e);
         
