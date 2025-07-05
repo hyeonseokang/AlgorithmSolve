@@ -40,9 +40,6 @@ void Add(queue<Stone> &q, int a, int b){
     
     SortStone(ca, cb, cc);
     
-    if(ca < 0 || cc > sumNum)
-        return;
-    
     if(visited[ca][cb] == false){
         visited[ca][cb] = true;
         q.push(Stone(ca, cb));
