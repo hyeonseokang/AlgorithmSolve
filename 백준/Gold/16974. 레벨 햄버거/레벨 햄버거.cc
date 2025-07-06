@@ -5,12 +5,9 @@ using namespace std;
 
 int N;
 long long X;
-long long burgerIngredientCnts[51] = {0};
 long long patty[51] = {0};
 long long burn[51] = {0};
 long long burger[51] = {0};
-
-unordered_map<long long, long long> dp[51];
 
 long long solve(int n, long long x){
     if(n == 0 && x == 1)
