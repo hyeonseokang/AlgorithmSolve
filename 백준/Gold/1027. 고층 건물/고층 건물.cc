@@ -5,6 +5,7 @@
 using namespace std;
 
 int heights[50] = {0};
+int results[50] = {0};
 int n;
 
 double GetGradient(int y1, int x1, int y2, int x2){
@@ -22,26 +23,18 @@ int main(){
     
     int result = 0;
     for(int i=0;i<n;i++){
-        int visibleCount = 0;
         int height = heights[i];
-        double minGradient = INT_MAX;
-        for(int j=i-1;j>=0;j--){
-            double gradient = GetGradient(height, i, heights[j], j);
-            if(minGradient > gradient){
-                minGradient = gradient;
-                visibleCount++;
-            }
-        }
         double maxGradient = INT_MIN;
         for(int j=i+1;j<n;j++){
             double gradient = GetGradient(height, i, heights[j], j);
             if(maxGradient < gradient){
                 maxGradient = gradient;
-                visibleCount++;
+                results[i]++;
+                results[j]++;
             }
         }
         
-        result = max(result, visibleCount);
+        result = max(result, results[i]);
     }
     
     cout << result << "\n";
