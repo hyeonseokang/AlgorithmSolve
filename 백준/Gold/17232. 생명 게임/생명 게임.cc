@@ -6,6 +6,7 @@ using namespace std;
 int n, m, t;
 int k, a, b;
 string gameMap[100];
+int prefixSums[100][100] = {0};
 enum class State{
     None,
     Survival,   // 생존
@@ -16,20 +17,12 @@ enum class State{
 
 State stateMap[100][100];
 
-bool IsOutSide(int y, int x){
-    return x < 0 || y < 0 || x >= m || y >= n;
-}
-
 bool IsCreature(int y, int x){
-    if(IsOutSide(y, x))
-        return false;
-    
     return gameMap[y][x] == '*'?true:false;
 }
 
 void SetState(int y, int x, int cnt){
     if(IsCreature(y, x) == true){
-        cnt--;
         if(a <= cnt && cnt <= b)
             stateMap[y][x] = State::Survival;
         else if(cnt < a)
@@ -45,43 +38,56 @@ void SetState(int y, int x, int cnt){
     }
 }
 
-void Scan(){
-    int y = 0, x = 0;
-    int dx = 1;
-    
-    int cnt = 0;
-    for(int i=y-k;i<=y+k;i++){
-        for(int j=x-k;j<=x+k;j++){
-            if(IsCreature(i, j))
-                cnt++;
-        }
+void SetPrefix(){
+    prefixSums[0][0] = IsCreature(0, 0);
+    for(int i=1;i<n;i++){
+        prefixSums[i][0] = prefixSums[i-1][0] + IsCreature(i, 0);
+    }
+    for(int i=1;i<m;i++){
+        prefixSums[0][i] = prefixSums[0][i-1] + IsCreature(0, i);
     }
     
-    for(;y<n;y++){
-        while(true){
-            SetState(y, x, cnt);
-            x += dx;
-            if(IsOutSide(y, x) == true){
-                x -= dx;
-                dx *= -1;
-                break;
-            }
+    for(int i=1;i<n;i++){
+        for(int j=1;j<m;j++){
+            int up = prefixSums[i-1][j];
+            int left = prefixSums[i][j-1];
             
-            for(int cy = y - k;cy <= y + k;cy++){
-                if(IsCreature(cy, x - ((k + 1)* dx)))
-                    cnt--;
-                if(IsCreature(cy, x + (k * dx)))
-                    cnt++;
-            }
-        }
-        
-        for(int cx = x - k;cx <= x + k;cx++){
-            if(IsCreature(y-k, cx))
-                cnt--;
-            if(IsCreature(y+k+1, cx))
-                cnt++;
+            prefixSums[i][j] = up + left - prefixSums[i-1][j-1];
+            prefixSums[i][j] += IsCreature(i, j);
         }
     }
+}
+
+int GetCnt(int y, int x){
+    int luY = y - k, luX = x - k;
+    int rdY = y + k, rdX = x + k;
+    if(rdY >= n)
+        rdY = n - 1;
+    if(rdX >= m)
+        rdX = m - 1;
+    
+    int up = 0, left = 0;
+    if(luY > 0)
+        up = prefixSums[luY - 1][rdX];
+    if(luX > 0)
+        left = prefixSums[rdY][luX - 1];
+    
+    int my = IsCreature(y, x);
+    
+    if(luY <= 0 || luX <= 0)
+        return prefixSums[rdY][rdX] - up - left - my;
+    else
+        return prefixSums[rdY][rdX] - up - left + prefixSums[luY-1][luX-1] - my;
+}
+
+void Scan(){
+    for(int i=0;i<n;i++){
+        for(int j=0;j<m;j++){
+            int cnt = GetCnt(i, j);
+            SetState(i, j, cnt);
+        }
+    }
+    
 }
 
 void Excute(){
@@ -108,11 +114,10 @@ int main(){
     }
     
     while(t--){
+        SetPrefix();
         Scan();
         Excute();
-        
     }
-    
     
     for(int i=0;i<n;i++){
         cout << gameMap[i] << "\n";
