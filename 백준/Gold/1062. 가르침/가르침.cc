@@ -24,6 +24,8 @@ void solve(int len, int i, int bit){
     }
     
     for(;i<26;i++){
+        if((bit & (1 << i)) == true)
+            continue;
         int idx = alphabetCnts[i].second - 'a';
         int nextBit = (bit | (1 << idx));
         solve(len + 1, i+1, nextBit);
@@ -53,8 +55,15 @@ int main(){
     }
     
     sort(alphabetCnts, alphabetCnts + 26, greater<pair<int, char>>());
-    if(k >= 5)
-        solve(0, 0, 0);
+    // anta tica => a, n, t, i, c
+    if(k >= 5){
+        int bit = 0;
+        string s = "antic";
+        for(int i=0;i<s.size();i++){
+            bit = (bit | (1 << (s[i] - 'a')));
+        }
+        solve(5, 0, bit);
+    }
     
     cout << maxResult << "\n";
     
