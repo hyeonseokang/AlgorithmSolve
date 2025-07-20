@@ -3,10 +3,6 @@
 #include<algorithm>
 #include<limits.h>
 
-#pragma GCC optimize("O3")
-#pragma GCC optimize("Ofast")
-#pragma GCC optimize("unroll-loops")
-
 using namespace std;
 
 int n, k;
@@ -27,7 +23,7 @@ void solve(int len, int i, int bit){
     }
     
     for(;i<26;i++){
-        if((bit & (1 << i)))
+        if((bit & (1 << i)) == true)
             continue;
         int nextBit = (bit | (1 << i));
         solve(len + 1, i+1, nextBit);
