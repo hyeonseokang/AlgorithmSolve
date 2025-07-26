@@ -6,9 +6,9 @@ using namespace std;
 
 string s;
 
-long long dp[40] = {0};
+int dp[40] = {0};
 
-long long solve(int len){
+int solve(int len){
     if(s.size() == len){
         return 1;
     }
@@ -16,7 +16,7 @@ long long solve(int len){
     if(s[len] == '0')
         return 0;
     
-    long long& result = dp[len];
+    int& result = dp[len];
     if(dp[len] != -1)
         return result;
     result = 0;
@@ -45,7 +45,7 @@ int main(){
     memset(dp, -1, sizeof(dp));
     
     cin >> s;
-    long long result = solve(0);
+    int result = solve(0);
     
     cout << result << "\n";
     
