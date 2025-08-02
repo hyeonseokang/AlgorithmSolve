@@ -7,51 +7,35 @@ using namespace std;
 int n;
 string nodeColors;
 vector<vector<int>> tree;
-vector<bool> visited;
+bool visited[200001] = {false};
+int result = 0;
 
-namespace State{
-constexpr int InSide = 0;
-constexpr int OutSide = 1;
-}
 
 bool IsInSide(int node){
     return nodeColors[node] == '1'?true:false;
 }
 
 int Solve(int s){
-    
-    int result = 0;
     vector<int>& nodes = tree[s];
     
     int insideCount = 0;
-    if(IsInSide(s)){
-        for(int i=0;i<nodes.size();i++){
-            int e = nodes[i];
-            if(visited[e] == true) continue;
-            
-            if(IsInSide(e)){
-                insideCount++;
-            }
-            visited[e] = true;
-            result += Solve(e);
+    
+    for(int i=0;i<nodes.size();i++){
+        int e = nodes[i];
+        
+        if(IsInSide(e)){
+            insideCount++;
         }
-        result += (insideCount * 2);
-    }
-    else{
-        for(int i=0;i<nodes.size();i++){
-            int e = nodes[i];
-            if(visited[e] == true) continue;
-            
-            if(IsInSide(e)){
-                insideCount++;
-            }
-            visited[e] = true;
-            result += Solve(e);
+        else if(visited[e] == true){
+            continue;
         }
-        if(insideCount > 0)
-            result += (insideCount * (insideCount + 1));
+        else{
+            visited[e] = true;
+            insideCount += Solve(e);
+        }
     }
-    return result;
+    
+    return insideCount;
 }
 
 int main(){
@@ -62,16 +46,31 @@ int main(){
     cin >> nodeColors;
     nodeColors = "0" + nodeColors;
     tree.resize(n + 1);
-    visited.resize(n + 1, false);
     for(int i=1;i<n;i++){
         int a, b;
         cin >> a >> b;
+        
+        bool isInsideA = IsInSide(a);
+        bool isInsideB = IsInSide(b);
+        
+        if(isInsideA && isInsideB){
+            result += 2;
+            continue;
+        }
         
         tree[a].emplace_back(b);
         tree[b].emplace_back(a);
     }
     
-    visited[1] = true;
-    cout << Solve(1);
+    for(int i=1;i<=n;i++){
+        if(!IsInSide(i) && visited[i] == false){
+            visited[i] = true;
+            int insideCount = Solve(i);
+            if(insideCount > 0)
+                result += (insideCount * (insideCount - 1));
+        }
+    }
+    
+    cout << result << "\n";
     return 0;
 }
