@@ -25,15 +25,16 @@ bool isEnd = false;
 
 int dy[4] = {-1, 0, 1, 0};
 int dx[4] = {0, 1, 0, -1};
+int successBoxCount = 0;
 
 enum class Type{
-    Blank, // .
-    Wall, // #
-    BlankGoal, // +
-    Box, // b
-    GoalBox, // B
-    Player, // w
-    GoalPlayer  // W
+    Blank,
+    Wall,
+    BlankGoal,
+    Box,
+    GoalBox,
+    Player,
+    GoalPlayer
 };
 
 int GetOperIndex(const char oper){
@@ -51,103 +52,97 @@ int GetOperIndex(const char oper){
 
 Type GetType(int y, int x){
     Type type = Type::Blank;
-    char c = board[y][x];
-    if(c == '.')
+    if(board[y][x] == '.')
         type = Type::Blank;
-    else if(c == '#')
+    else if(board[y][x] == '#')
         type = Type::Wall;
-    else if(c == '+')
+    else if(board[y][x] == '+')
         type = Type::BlankGoal;
-    else if(c == 'b')
+    else if(board[y][x] == 'b')
         type = Type::Box;
-    else if(c == 'B')
+    else if(board[y][x] == 'B')
         type = Type::GoalBox;
-    else if(c == 'w')
+    else if(board[y][x] == 'w')
         type = Type::Player;
-    else if(c == 'W')
+    else if(board[y][x] == 'W')
         type = Type::GoalPlayer;
     
     return type;
 }
 
-void MoveUpdatePlayer(const Type& type){
-    if(type == Type::Player)
-        board[playerPosition.y][playerPosition.x] = '.';
-    else if(type == Type::GoalPlayer)
-        board[playerPosition.y][playerPosition.x] = '+';
-}
-
-bool IsOut(const Pos& pos){
-    if(pos.y < 0 || pos.x < 0 || pos.y >= r || pos.x >= c)
-        return true;
-    
-    return false;
-}
-void CalculateOper(const char oper){
-    int dir = GetOperIndex(oper);
-    Pos next = Pos(playerPosition.y + dy[dir], playerPosition.x + dx[dir]);
-    if(IsOut(next))
+void MovePlayer(const Pos& next, const Type& nextType){
+    if(nextType != Type::Blank && nextType != Type::BlankGoal)
         return;
     
-    Type nextType = GetType(next.y, next.x);
+    if(nextType == Type::Blank){
+        board[next.y][next.x] = 'w';
+    }
+    if(nextType == Type::BlankGoal){
+        board[next.y][next.x] = 'W';
+    }
+    
     Type currentType = GetType(playerPosition.y, playerPosition.x);
+    if(currentType == Type::GoalPlayer)
+        board[playerPosition.y][playerPosition.x] = '+';
+    if(currentType == Type::Player)
+        board[playerPosition.y][playerPosition.x] = '.';
+    
+    
+    playerPosition = next;
+}
+
+// ULRURDDDUULLDDD
+void MoveBox(const Pos& boxPos, const Type& boxType, const int direction){
+    Pos next = Pos(boxPos.y + dy[direction], boxPos.x + dx[direction]);
+    Type nextType = GetType(next.y, next.x);
+    
+    if(nextType != Type::Blank && nextType != Type::BlankGoal)
+        return;
+    
+    
+    if(nextType == Type::BlankGoal){
+        board[next.y][next.x] = 'B';
+    }
+    if(nextType == Type::Blank)
+        board[next.y][next.x] = 'b';
+    
+    if(boxType == Type::GoalBox){
+        board[boxPos.y][boxPos.x] = '+';
+    }
+    if(boxType == Type::Box){
+        board[boxPos.y][boxPos.x] = '.';
+    }
+    
+}
+// DLLUDLULUURDRDDLUDRR
+
+void CalculateOper(const char oper){
+    int direction = GetOperIndex(oper);
+    Pos next = Pos(playerPosition.y + dy[direction], playerPosition.x + dx[direction]);
+    
+    Type nextType = GetType(next.y, next.x);
     if(nextType == Type::Wall){
         return;
     }
     
-    if(nextType == Type::Blank){
-        MoveUpdatePlayer(currentType);
-        board[next.y][next.x] = 'w';
-        playerPosition = next;
+    if(nextType == Type::Box || nextType == Type::GoalBox){
+        Type boxType = GetType(next.y, next.x);
+        MoveBox(next, boxType, direction);
     }
-    else if(nextType == Type::BlankGoal){
-        MoveUpdatePlayer(currentType);
-        board[next.y][next.x] = 'W';
-        playerPosition = next;
-    }
-    else if(nextType == Type::Box){
-        Pos nnext = Pos(next.y + dy[dir], next.x + dx[dir]);
-        Type nnextType = GetType(nnext.y, nnext.x);
-        if(IsOut(nnext))
-            return;
-        if(nnextType == Type::Blank){
-            board[nnext.y][nnext.x] = 'b';
-            board[next.y][next.x] = 'w';
-            MoveUpdatePlayer(currentType);
-            playerPosition = next;
-        }
-        else if(nnextType == Type::BlankGoal){
-            board[nnext.y][nnext.x] = 'B';
-            board[next.y][next.x] = 'w';
-            MoveUpdatePlayer(currentType);
-            playerPosition = next;
-        }
-    }
-    else if(nextType == Type::GoalBox){
-        Pos nnext = Pos(next.y + dy[dir], next.x + dx[dir]);
-        Type nnextType = GetType(nnext.y, nnext.x);
-        if(IsOut(nnext))
-            return;
-        
-        if(nnextType == Type::Blank){
-            board[nnext.y][nnext.x] = 'b';
-            board[next.y][next.x] = 'W';
-            MoveUpdatePlayer(currentType);
-            playerPosition = next;
-        }
-        else if(nnextType == Type::BlankGoal){
-            board[nnext.y][nnext.x] = 'B';
-            board[next.y][next.x] = 'W';
-            MoveUpdatePlayer(currentType);
-            playerPosition = next;
-        }
+    
+    nextType = GetType(next.y, next.x);
+    if(nextType == Type::Blank || nextType == Type::BlankGoal)
+    {
+        MovePlayer(next, nextType);
     }
 }
 
 bool IsEnd(){
     for(int i=0;i<r;i++){
         for(int j=0;j<c;j++){
-            if(board[i][j] == 'b')
+            if(board[i][j] == 'W'||
+               board[i][j] == 'b' ||
+               board[i][j] == '+' )
                 return false;
         }
     }
@@ -162,6 +157,7 @@ int main(){
     int gameCount = 0;
     while(true){
         isEnd = false;
+        successBoxCount = 0;
         gameCount++;
         cin >> r >> c;
         if(r == 0 || c == 0)
@@ -173,15 +169,19 @@ int main(){
                 if(board[i][j] == 'w' || board[i][j] == 'W'){
                     playerPosition = Pos(i, j);
                 }
+                else if(board[i][j] == 'b')
+                    successBoxCount--;
             }
         }
         
+        // DDDLLLUUR
+        
         cin >> operators;
         for(int i=0;i<operators.size();i++){
+            CalculateOper(operators[i]);
+            
             if(IsEnd() == true)
                 break;
-            
-            CalculateOper(operators[i]);
         }
         
         
