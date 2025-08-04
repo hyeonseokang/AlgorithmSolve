@@ -25,16 +25,15 @@ bool isEnd = false;
 
 int dy[4] = {-1, 0, 1, 0};
 int dx[4] = {0, 1, 0, -1};
-int successBoxCount = 0;
 
 enum class Type{
-    Blank,
-    Wall,
-    BlankGoal,
-    Box,
-    GoalBox,
-    Player,
-    GoalPlayer
+    Blank, // .
+    Wall, // #
+    BlankGoal, // +
+    Box, // b
+    GoalBox, // B
+    Player, // w
+    GoalPlayer  // W
 };
 
 int GetOperIndex(const char oper){
@@ -52,19 +51,20 @@ int GetOperIndex(const char oper){
 
 Type GetType(int y, int x){
     Type type = Type::Blank;
-    if(board[y][x] == '.')
+    char c = board[y][x];
+    if(c == '.')
         type = Type::Blank;
-    else if(board[y][x] == '#')
+    else if(c == '#')
         type = Type::Wall;
-    else if(board[y][x] == '+')
+    else if(c == '+')
         type = Type::BlankGoal;
-    else if(board[y][x] == 'b')
+    else if(c == 'b')
         type = Type::Box;
-    else if(board[y][x] == 'B')
+    else if(c == 'B')
         type = Type::GoalBox;
-    else if(board[y][x] == 'w')
+    else if(c == 'w')
         type = Type::Player;
-    else if(board[y][x] == 'W')
+    else if(c == 'W')
         type = Type::GoalPlayer;
     
     return type;
@@ -82,16 +82,18 @@ void MovePlayer(const Pos& next, const Type& nextType){
     }
     
     Type currentType = GetType(playerPosition.y, playerPosition.x);
-    if(currentType == Type::GoalPlayer)
+    if(currentType == Type::GoalPlayer){
         board[playerPosition.y][playerPosition.x] = '+';
-    if(currentType == Type::Player)
+        playerPosition = Pos(next.y, next.x);
+    }
+    if(currentType == Type::Player){
         board[playerPosition.y][playerPosition.x] = '.';
+        playerPosition = Pos(next.y, next.x);
+    }
     
     
-    playerPosition = next;
 }
 
-// ULRURDDDUULLDDD
 void MoveBox(const Pos& boxPos, const Type& boxType, const int direction){
     Pos next = Pos(boxPos.y + dy[direction], boxPos.x + dx[direction]);
     Type nextType = GetType(next.y, next.x);
@@ -103,8 +105,9 @@ void MoveBox(const Pos& boxPos, const Type& boxType, const int direction){
     if(nextType == Type::BlankGoal){
         board[next.y][next.x] = 'B';
     }
-    if(nextType == Type::Blank)
+    if(nextType == Type::Blank){
         board[next.y][next.x] = 'b';
+    }
     
     if(boxType == Type::GoalBox){
         board[boxPos.y][boxPos.x] = '+';
@@ -114,7 +117,6 @@ void MoveBox(const Pos& boxPos, const Type& boxType, const int direction){
     }
     
 }
-// DLLUDLULUURDRDDLUDRR
 
 void CalculateOper(const char oper){
     int direction = GetOperIndex(oper);
@@ -126,8 +128,7 @@ void CalculateOper(const char oper){
     }
     
     if(nextType == Type::Box || nextType == Type::GoalBox){
-        Type boxType = GetType(next.y, next.x);
-        MoveBox(next, boxType, direction);
+        MoveBox(next, nextType, direction);
     }
     
     nextType = GetType(next.y, next.x);
@@ -140,8 +141,7 @@ void CalculateOper(const char oper){
 bool IsEnd(){
     for(int i=0;i<r;i++){
         for(int j=0;j<c;j++){
-            if(board[i][j] == 'W'||
-               board[i][j] == 'b' ||
+            if(board[i][j] == 'b' ||
                board[i][j] == '+' )
                 return false;
         }
@@ -157,7 +157,6 @@ int main(){
     int gameCount = 0;
     while(true){
         isEnd = false;
-        successBoxCount = 0;
         gameCount++;
         cin >> r >> c;
         if(r == 0 || c == 0)
@@ -169,12 +168,8 @@ int main(){
                 if(board[i][j] == 'w' || board[i][j] == 'W'){
                     playerPosition = Pos(i, j);
                 }
-                else if(board[i][j] == 'b')
-                    successBoxCount--;
             }
         }
-        
-        // DDDLLLUUR
         
         cin >> operators;
         for(int i=0;i<operators.size();i++){
