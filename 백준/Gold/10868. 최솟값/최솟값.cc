@@ -2,17 +2,12 @@
 #include<algorithm>
 #include<limits.h>
 #include<vector>
-#include<map>
-#include<unordered_map>
 
 using namespace std;
 
 int n, m;
 vector<int> numbers;
 vector<int> segment;
-typedef pair<int, int> PAIR;
-map<PAIR, int> dp;
-
 void Init(int idx, int l, int r){
     if(l >= r){
         segment[idx] = numbers[l];
@@ -30,29 +25,20 @@ void Init(int idx, int l, int r){
 }
 
 int Query(int a, int b, int l, int r, int idx){
-    if(a >= b){
-        return numbers[a];
+    if(r < a || b < l){
+        return INT_MAX;
     }
-    if(l >= r){
+    if(a <= l && r <= b){
         return segment[idx];
     }
     
-    pair<int, int> p = make_pair(a, b);
-    if(dp.find(p) != dp.end())
-        return dp[p];
-    
     int m = (l + r) / 2;
     int leftNum = INT_MAX, rightNum = INT_MAX;
-    if(a <= m){
-        leftNum = Query(a, min(b, m), l, m, idx * 2);
-    }
     
-    if(b > m){
-        rightNum = Query(max(a, m + 1), b, m+1, r, idx * 2 + 1);
-    }
+    leftNum = Query(a, b, l, m, idx * 2);
+    rightNum = Query(a, b, m+1, r, idx * 2 + 1);
     
-    
-    return dp[p] = min(leftNum, rightNum);
+    return min(leftNum, rightNum);
 }
 
 int main(){
