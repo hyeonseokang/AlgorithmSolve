@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
+#include<cstring>
 
 using namespace std;
 
@@ -9,13 +10,8 @@ vector<int> weights;
 vector<vector<int>> nodes;
 
 int dp[10001][2] = {0};
-vector<int> dpPath[10001][2];
 bool visited[10001] = {false};
 
-// 4 1
-// 4 1
-// a * 2 + 1
-// /2, %2
 void solve(int s){
     for(int i=0;i<nodes[s].size();i++){
         int e = nodes[s][i];
@@ -24,31 +20,24 @@ void solve(int s){
         visited[e] = true;
         solve(e);
         
-        
-        if(dp[e][0] >= dp[e][1]){
-            dpPath[s][0].emplace_back(e*2);
-            dp[s][0] += dp[e][0];
-        }
-        else{
-            dpPath[s][0].emplace_back(e*2+1);
-            dp[s][0] += dp[e][1];
-        }
+        dp[s][0] += max(dp[e][0], dp[e][1]);
         dp[s][1] += dp[e][0];
-        dpPath[s][1].emplace_back(e * 2);
     }
     
     dp[s][1] += weights[s];
 }
 
-void SetPath(vector<int>& path, int s){
-    if(s % 2 == 1){
-        path.emplace_back(s/2);
+void SetPath(vector<int>& path, int s, int prev){
+    if(dp[s][1] > dp[s][0] && visited[prev] == false){
+        path.emplace_back(s);
+        visited[s] = true;
     }
     
-    vector<int>& nodePath = dpPath[s/2][s%2];
-    for(int i=0;i<nodePath.size();i++){
-        int e = nodePath[i];
-        SetPath(path, e);
+    for(int i=0;i<nodes[s].size();i++){
+        int e = nodes[s][i];
+        if(e == prev) continue;
+        
+        SetPath(path, e, s);
     }
 }
 
@@ -73,14 +62,9 @@ int main(){
     visited[1] = true;
     solve(1);
     vector<int> path;
-    if(dp[1][0] < dp[1][1]){
-        cout << dp[1][1] << "\n";
-        SetPath(path, 3);
-    }
-    else{
-        cout << dp[1][0] << "\n";
-        SetPath(path, 2);
-    }
+    memset(visited, false, sizeof(visited));
+    cout << max(dp[1][0], dp[1][1]) << "\n";
+    SetPath(path, 1, 0);
     
     sort(path.begin(), path.end());
     for(int i=0;i<path.size();i++){
