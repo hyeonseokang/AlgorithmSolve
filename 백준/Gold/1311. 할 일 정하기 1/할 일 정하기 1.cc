@@ -6,13 +6,8 @@
 
 using namespace std;
 
-#define COST 10000
-#define MAX_COST(X) X*COST
-typedef pair<int, int> PAIR;
-
 int n;
-vector<vector<PAIR>> costs;
-int workMinCost[20] = {0};
+int costs[20][20] = {0};
 vector<int> dp;
 
 
@@ -26,12 +21,10 @@ int solve(int len,int bit){
     int& result = dp[bit] = INT_MAX;
     
     
-    vector<PAIR>& works = costs[len];
-    for(int i=0;i<works.size();i++){
-        const PAIR& p = works[i];
-        if((bit & (1 << p.second))) continue;
-        int next = (bit | (1 << p.second));
-        result = min(result, solve(len + 1, next) + p.first);
+    for(int i=0;i<n;i++){
+        if((bit & (1 << i))) continue;
+        int next = (bit | (1 << i));
+        result = min(result, solve(len + 1, next) + costs[len][i]);
     }
     
     return result;
@@ -42,19 +35,11 @@ int main(){
     
     cin >> n;
     dp.resize(1 << n, -1);
+    
     for(int i=0;i<n;i++){
-        workMinCost[i] = INT_MAX;
-    }
-    costs.resize(n);
-    for(int i=0;i<n;i++){
-        costs[i].resize(n);
         for(int j=0;j<n;j++){
-            cin >> costs[i][j].first;
-            costs[i][j].second = j;
-            workMinCost[j] = min(workMinCost[j], costs[i][j].first);
+            cin >> costs[i][j];
         }
-        
-        sort(costs[i].begin(), costs[i].end());
     }
     
     cout << solve(0, 0) << "\n";
