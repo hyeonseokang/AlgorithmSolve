@@ -13,13 +13,14 @@ typedef pair<int, int> PAIR;
 int n;
 vector<vector<PAIR>> costs;
 int workMinCost[20] = {0};
-unordered_map<int, int> dp;
+vector<int> dp;
+
 
 int solve(int len,int bit){
     if(len == n){
         return 0;
     }
-    if(dp.find(bit) != dp.end())
+    if(dp[bit] != -1)
         return dp[bit];
     
     int& result = dp[bit] = INT_MAX;
@@ -40,6 +41,7 @@ int main(){
     cin.tie(0);
     
     cin >> n;
+    dp.resize(1 << n, -1);
     for(int i=0;i<n;i++){
         workMinCost[i] = INT_MAX;
     }
