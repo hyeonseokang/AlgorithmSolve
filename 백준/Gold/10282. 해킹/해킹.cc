@@ -1,6 +1,7 @@
 #include<iostream>
 #include<queue>
 #include<vector>
+#include<limits.h>
 
 using namespace std;
 
@@ -11,32 +12,37 @@ vector<vector<pair<int, int>>> dependencies;
 void BFS(){
     priority_queue<pair<int, int>,  vector<pair<int, int>>, greater<pair<int, int>>> pq;
     pq.push({0, c});
-    vector<bool> visited(n + 1, false);
     
-    int lastTime = 0;
-    int virusCnt = 0;
+    vector<int> dists(n + 1, INT_MAX);
+    dists[c] = 0;
     
     while(!pq.empty()){
         int currentTime = pq.top().first;
         int s = pq.top().second;
         pq.pop();
-        if(visited[s] == true)
-            continue;
         
-        visited[s] = true;
-        lastTime = currentTime;
-        virusCnt++;
+        if(dists[s] < currentTime)
+            continue;
         
         vector<pair<int, int>>& dependency = dependencies[s];
         for(int i=0;i<dependency.size();i++){
             int e = dependency[i].first;
-            if(visited[e] == true) continue;
-            
             int nTime = dependency[i].second + currentTime;
-            pq.push({nTime, e});
+            if(dists[e] > nTime){
+                dists[e] = nTime;
+                pq.push({nTime, e});
+            }
         }
     }
     
+    int lastTime = 0;
+    int virusCnt = 0;
+    for(int i=1;i<dists.size();i++){
+        if(dists[i] != INT_MAX){
+            virusCnt++;
+            lastTime = max(lastTime, dists[i]);
+        }
+    }
     cout << virusCnt << " " << lastTime << "\n";
 }
 
