@@ -9,14 +9,6 @@ int weights[30];
 vector<int> combinations;
 long long result = 0;
 
-// 2 1
-// 1 1
-
-// 0 1
-
-// 0일때 c - sums = 1
-// 1일때 c - sums = 0
-
 void Init(int l, int r, int sums, bool isInit = false) {
 	if (sums > c) return;
 
