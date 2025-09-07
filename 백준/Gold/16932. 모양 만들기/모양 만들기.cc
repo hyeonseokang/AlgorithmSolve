@@ -6,9 +6,7 @@
 using namespace std;
 
 int n, m;
-map<int, int> shapeSize;
-
-
+vector<int> shapeSize(1, 0);
 bool boards[1000][1000];
 int dy[4] = {-1, 0, 1, 0};
 int dx[4] = {0, 1, 0, -1};
@@ -17,9 +15,9 @@ int shapeCnt = 0;
 
 void BFS(int sy, int sx){
     shapeNumbers[sy][sx] = ++shapeCnt;
+    shapeSize.emplace_back(0);
     queue<pair<int, int>> q;
     int parent = shapeNumbers[sy][sx];
-    shapeSize[parent] = 0;
     q.push({sy, sx});
     
     while(!q.empty()){
