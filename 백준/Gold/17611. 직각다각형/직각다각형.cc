@@ -1,9 +1,6 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
-#include<cmath>
-#include<map>
-#include<unordered_set>
 #include<queue>
 
 using namespace std;
@@ -11,12 +8,9 @@ using namespace std;
 int n;
 vector<pair<int, int>> positions;
 
-int CalculateMaxLines(vector<pair<int, int>>& lines, const unordered_set<int>& us){
+int CalculateMaxLines(vector<pair<int, int>>& lines){
     sort(lines.begin(), lines.end());
     priority_queue<int, vector<int>, greater<int>> pq;
-    
-    vector<int> v(us.begin(), us.end());
-    sort(v.begin(), v.end());
     
     int result = 0;
     
@@ -29,19 +23,7 @@ int CalculateMaxLines(vector<pair<int, int>>& lines, const unordered_set<int>& u
         }
         
         pq.push(e);
-        
-        auto sIt = lower_bound(v.begin(), v.end(), s);
-        auto eIt = lower_bound(v.begin(), v.end(), pq.top());
-        if(sIt == v.end() || eIt == v.end() || *sIt != s || *eIt != pq.top()){
-            result = max(result, (int)pq.size());
-            continue;
-        }
-        
-        int len = abs((int)(eIt - sIt));
-        if(s - pq.top() != len){
-            result = max(result, (int)pq.size());
-            continue;
-        }
+        result = max(result, (int)pq.size());
     }
     
     
@@ -60,8 +42,6 @@ int main(){
     
     vector<pair<int, int>> horizontalLines;
     vector<pair<int, int>> verticalLines;
-    unordered_set<int> horizontalSet;
-    unordered_set<int> verticalSet;
     for(int i=0;i<n;i++){
         int next = (i + 1) % n;
         if(positions[i].first != positions[next].first){
@@ -69,19 +49,17 @@ int main(){
             int e = positions[next].first;
             
             horizontalLines.emplace_back(min(s, e), max(s, e));
-            horizontalSet.insert(positions[i].second);
         }
         if(positions[i].second != positions[next].second){
             int s = positions[i].second;
             int e = positions[next].second;
             
             verticalLines.emplace_back(min(s, e), max(s, e));
-            verticalSet.insert(positions[i].first);
         }
     }
     
-    int h = CalculateMaxLines(horizontalLines, horizontalSet);
-    int v = CalculateMaxLines(verticalLines, verticalSet);
+    int h = CalculateMaxLines(horizontalLines);
+    int v = CalculateMaxLines(verticalLines);
     int result = max(h, v);
     
     cout << result << "\n";
