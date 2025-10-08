@@ -4,9 +4,9 @@ using namespace std;
 
 int cnts[28] = {0};
 
-void solve(int i, int c){
-    if(i == 0){
-        if(c == 1){
+void solve(int n, int len, int k){
+    if(n <= 3){
+        if(n == 1){
             cout << "m\n";
         }
         else{
@@ -15,18 +15,21 @@ void solve(int i, int c){
         return;
     }
     
-    int prevLen = cnts[i-1];
-    if(c <= prevLen){
-        solve(i - 1, c);
-    }
-    else if(c - prevLen == 1){
-        cout << "m\n";
-    }
-    else if(c <= prevLen + i + 3){
-        cout << "o\n";
+    int nLen = len * 2 + k + 4;
+    if(nLen <= n){
+        solve(n, nLen, k + 1);
     }
     else{
-        solve(i - 1, c - prevLen - i - 3);
+        int mLen = n - len;
+        if(mLen == 1){
+            cout << "m\n";
+        }
+        else if(mLen <= k + 4){
+            cout << "o\n";
+        }
+        else{
+            solve(mLen - k - 4, 3, 0);
+        }
     }
 }
 
@@ -36,16 +39,6 @@ int main(){
     
     int n;
     cin >> n;
-    
-    int len = 3;
-    int i = 0;
-    for(i=0;i<1000;){
-        cnts[i] = len;
-        if(len >= n)
-            break;
-        i++;
-        len = len * 2 + i + 3;
-    }
-    solve(i, n);
+    solve(n, 3, 0);
     return 0;
 }
