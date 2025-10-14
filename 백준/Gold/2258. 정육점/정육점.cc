@@ -27,31 +27,32 @@ int main(){
     }
     
     sort(meats.begin(), meats.end(), Compare);
-    vector<pair<int, int>> sums; // sums, cost;
     
     int currentCost = -1;
     int prevSums = 0;
     int prevCostSums = 0;
+    long long result = (long long)INT_MAX + 1;
+    
     for(int i=0;i<n;i++){
         int cost = meats[i].first;
         int weight = meats[i].second;
         
         prevSums += weight;
+        
+        int costSums = 0;
         if(currentCost != cost){
             currentCost = cost;
             prevCostSums = cost;
-            sums.emplace_back(cost, prevSums);
+            costSums = cost;
         }
         else{ // 비용이 같음
             prevCostSums += cost;
-            sums.emplace_back(prevCostSums, prevSums);
+            costSums = prevCostSums;
         }
-    }
-    
-    long long result = (long long)INT_MAX + 1;
-    for(int i=0;i<sums.size();i++){
-        if(sums[i].second >= m){
-            result = min(result, (long long)sums[i].first);
+        
+        
+        if(prevSums >= m){
+            result = min(result, (long long)costSums);
         }
     }
     
