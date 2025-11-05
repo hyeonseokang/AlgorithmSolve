@@ -6,46 +6,42 @@
 
 using namespace std;
 
-int dp[3000][3000];
-bool visited[3000][3000] = { false };
+int dp[3001][3001] = { 0 };
 int a, b, c;
 string s1, s2;
-
-int solve(int idx1, int idx2) {
-	if (idx1 == s1.size() && idx2 == s2.size()) {
-		return 0;
-	}
-	else if (idx1 == s1.size()) {
-		return (s2.size() - idx2) * b;
-	}
-	else if (idx2 == s2.size()) {
-		return (s1.size() - idx1) * b;
-	}
-
-	int& ret = dp[idx1][idx2];
-	if (visited[idx1][idx2] == true) {
-		return ret;
-	}
-	visited[idx1][idx2] = true;
-	ret = INT_MIN;
-	ret = max(ret, solve(idx1 + 1, idx2) + b);
-	ret = max(ret, solve(idx1, idx2 + 1) + b);
-	int temp = s1[idx1] == s2[idx2] ? a : c;
-	ret = max(ret, solve(idx1 + 1, idx2 + 1) + temp);
-
-	return ret;
-}
 
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(0);
 
-	memset(dp, -1, sizeof(dp));
-
 	cin >> a >> b >> c;
 	cin >> s1 >> s2;
+	s1 = " " + s1;
+	s2 = " " + s2;
 
-	cout << solve(0, 0) << "\n";
+	dp[0][0] = 0;
+	for (int i = 1; i < s1.size(); i++) {
+		dp[i][0] = b * i;
+	}
+	for (int i = 1; i < s2.size(); i++) {
+		dp[0][i] = b * i;
+	}
+
+	for (int i = 1; i < s1.size(); i++) {
+		for (int j = 1; j < s2.size(); j++) {
+			int& ret = dp[i][j];
+			if (s1[i] == s2[j]) {
+				ret = dp[i - 1][j - 1] + a;
+			}
+			else {
+				ret = dp[i - 1][j - 1] + c;
+				ret = max(ret, dp[i - 1][j] + b);
+				ret = max(ret, dp[i][j - 1] + b);
+			}
+		}
+	}
+
+	cout << dp[s1.size() - 1][s2.size() - 1] << "\n";
 
 	return 0;
 }
