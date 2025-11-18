@@ -21,18 +21,18 @@ bool IsOutSide(int y, int x) {
 }
 
 int solve() {
-	priority_queue <Node, vector<Node>, greater<Node>> pq;
+	queue <Node> pq;
 	pq.push({ 0, {{1, 0}, {s}} });
 	pq.push({ 0, {{-1, 0}, {s}} });
 	pq.push({ 0, {{0, 1}, {s}} });
 	pq.push({ 0, {{0, -1}, {s}} });
 
 	while (!pq.empty()) {
-		int cnt = pq.top().first;
-		int dy = pq.top().second.first.first;
-		int dx = pq.top().second.first.second;
-		int y = pq.top().second.second.first;
-		int x = pq.top().second.second.second;
+		int cnt = pq.front().first;
+		int dy = pq.front().second.first.first;
+		int dx = pq.front().second.first.second;
+		int y = pq.front().second.second.first;
+		int x = pq.front().second.second.second;
 		pq.pop();
 		y += dy, x += dx;
 		while (!IsOutSide(y, x)) {
