@@ -1,5 +1,6 @@
 #include<iostream>
 #include<string>
+#include<algorithm>
 
 using namespace std;
 
@@ -61,6 +62,12 @@ int main() {
 		}
 		y--;
 		x--;
+	}
+	for (int i = max(n - m, 0); i >= 1; i--) {
+		winBoards[i][0] = IsWin(i, 0);
+	}
+	for (int i = max(m - n, 0); i >= 1; i--) {
+		winBoards[0][i] = IsWin(0, i);
 	}
 	winBoards[0][0] = IsWin(0, 0);
 
