@@ -10,32 +10,73 @@ typedef pair<int, int> PAIR;
 int n, m, is, ie;
 
 vector<vector<PAIR>> graph;
+priority_queue<pair<int, pair<int, int>>> pq;
+vector<int> parents;
+
+int Find(int x){
+    int parent = parents[x];
+    if(parent == x)
+        return parent;
+    
+    return parents[parent] = Find(parent);
+}
+
+bool Merge(int a, int b){
+    int ap = Find(a);
+    int bp = Find(b);
+    
+    if(ap == bp){
+        return false;
+    }
+    
+    if(ap < bp){
+        parents[bp] = ap;
+    }
+    else{
+        parents[ap] = bp;
+    }
+    
+    return true;
+}
 
 int solve(){
-    priority_queue<PAIR> pq;
-    vector<int> weights(n + 1, -1);
-    weights[is] = INT_MAX;
-    pq.push({INT_MAX, is});
-    
     while(!pq.empty()){
-        int s = pq.top().second;
-        int weight = pq.top().first;
+        int s = pq.top().second.first;
+        int e = pq.top().second.second;
+        int k = pq.top().first;
         pq.pop();
+        
+        if(Merge(s, e)){
+            graph[s].emplace_back(e, k);
+            graph[e].emplace_back(s, k);
+        }
+    }
+    
+    queue<PAIR> q;
+    q.push({is, INT_MAX});
+    while(!q.empty()){
+        int s = q.front().first;
+        int k = q.front().second;
+        q.pop();
+        
+        if(s == ie){
+            return k;
+        }
         
         vector<PAIR>& v = graph[s];
         for(int i=0;i<v.size();i++){
             int e = v[i].first;
-            int nextWeight = min(v[i].second, weight);
-            
-            if(weights[e] == -1 || weights[e] < nextWeight){
-                pq.push({nextWeight, e});
-                weights[e] = nextWeight;
+            int weight = min(k, v[i].second);
+            if(parents[e] != 0){
+                parents[e] = 0;
+                q.push({e, weight});
             }
         }
     }
     
-    return weights[ie];
+    return 0;
 }
+
 
 int main(){
     ios::sync_with_stdio(false);
@@ -44,15 +85,17 @@ int main(){
     cin >> n >> m;
     cin >> is >> ie;
     graph.resize(n + 1);
+    parents.resize(n + 1);
+    for(int i=0;i<=n;i++){
+        parents[i] = i;
+    }
     for(int i=0;i<m;i++){
         int a, b, k;
         cin >> a >> b >> k;
-        graph[a].emplace_back(b, k);
-        graph[b].emplace_back(a, k);
+        pq.push({k, {a, b}});
     }
-    int result = solve();
-    if(result == -1)
-        result = 0;
-    cout << result << "\n";
+    
+    cout << solve() <<"\n";
+    
     return 0;
 }
