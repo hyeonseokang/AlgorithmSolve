@@ -1,43 +1,45 @@
 #include<iostream>
 #include<vector>
-#include<unordered_set>
+#include<queue>
 using namespace std;
 int n, a, b;
 
-unordered_set<int> us[20];
+typedef pair<int, int> PAIR;
 
 int main() {
 	ios::sync_with_stdio(false);
 	cin.tie(0);
 
 	cin >> n >> a >> b;
-	us[0].insert(a - 1);
-	us[0].insert(b - 1);
+	priority_queue<PAIR, vector<PAIR>, greater<PAIR>> q;
+	q.push({ 0, a - 1 });
+	q.push({ 0, b - 1 });
 	int result = -1;
-	for (int i = 0; i < 19; i++) {
-		int step = (1 << i);
-		unordered_set<int>& nextSet = us[i + 1];
-		for (int num : us[i]) {
-			int left = num - step;
-			int right = num + step;
-			if (left >= 0) {
-				if (nextSet.find(left) != nextSet.end()) {
-					result = i + 1;
-					break;
-				}
-				nextSet.insert(left);
-			}
-			if (right < n) {
-				if (nextSet.find(right) != nextSet.end()) {
-					result = i + 1;
-					break;
-				}
-				nextSet.insert(right);
+
+	while (!q.empty()) {
+		int bit = q.top().first;
+		int s = q.top().second;
+		int step = (1 << bit);
+		q.pop();
+
+		if (!q.empty()) {
+			if (s == q.top().second && bit == q.top().first) {
+				result = bit;
+				break;
 			}
 		}
-		if (result != -1) break;
-	}
 
+
+		int left = s - step;
+		int right = s + step;
+
+		if (left >= 0) {
+			q.push({ bit + 1, left});
+		}
+		if (right < n) {
+			q.push({ bit + 1, right });
+		}
+	}
 	cout << result << "\n";
 	return 0;
 }
