@@ -19,29 +19,29 @@ int main(){
     dists[si][0] = 0;
     dists[si][1] = 0;
     for(int i=1;i<=t;i++){
-        int prevDistIndex = i % 2;
-        int distIndex = 1 - prevDistIndex;
+        int prev = i % 2;
+        int current = 1 - prev;
         for(int j=0;j<m;j++){
             int s, e, cost;
             cin >> s >> e >> cost;
             
-            if(dists[s][prevDistIndex] != -1){
-                int temp = dists[s][prevDistIndex] + cost;
-                if(dists[e][prevDistIndex] == -1 || dists[e][prevDistIndex] > temp){
-                    dists[e][distIndex] = temp;
+            if(dists[s][prev] != -1){
+                int temp = dists[s][prev] + cost;
+                if(dists[e][prev] == -1 || dists[e][prev] > temp){
+                    dists[e][current] = temp;
                 }
             }
             
-            if(dists[e][prevDistIndex] != -1){
-                int temp = dists[e][prevDistIndex] + cost;
-                if(dists[s][prevDistIndex] == -1 || dists[s][prevDistIndex] > temp){
-                    dists[s][distIndex] = temp;
+            if(dists[e][prev] != -1){
+                int temp = dists[e][prev] + cost;
+                if(dists[s][prev] == -1 || dists[s][prev] > temp){
+                    dists[s][current] = temp;
                 }
             }
         }
         
         for(int i=0;i<10001;i++){
-            dists[i][prevDistIndex] = dists[i][distIndex];
+            dists[i][prev] = dists[i][current];
         }
     }
     
