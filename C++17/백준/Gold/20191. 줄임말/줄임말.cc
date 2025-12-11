@@ -1,13 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstring>
+#include <algorithm>
 
 using namespace std;
 
 string s, t;
 vector<int> alphabets[26];
-int alphabetIndex[26] = { 0 };
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -29,24 +28,14 @@ int main()
 			result = -1;
 			break;
 		}
-		if (alphabetIndex[index] < alphabet.size()) {
-			if (currentTIndex < alphabet[alphabetIndex[index]]) {
-				currentTIndex = alphabet[alphabetIndex[index]];
-				alphabetIndex[index]++;
-				continue;
-			}
-			else {
-				result++;
-				i--;
-				currentTIndex = -1;
-				memset(alphabetIndex, 0, sizeof(alphabetIndex));
-			}
-		}
-		else {
+		auto it = upper_bound(alphabet.begin(), alphabet.end(), currentTIndex);
+		if (it == alphabet.end()) {
 			result++;
 			i--;
 			currentTIndex = -1;
-			memset(alphabetIndex, 0, sizeof(alphabetIndex));
+		}
+		else {
+			currentTIndex = *it;
 		}
 	}
 
